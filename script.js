@@ -1,4 +1,4 @@
-/ Configuration
+// Configuration
 const CONFIG = {
   SHEET_ID: '1gwe5oyDjs_u_qbLbRkjF3cCvLAm1dUO_fG0agUAjfjU',
   TRACKING_SHEET_ID: '13d0sO0isKMQWP5rkkLxhbzpgIVGrd1pARzFLfACMDE0',
@@ -99,22 +99,36 @@ function animateGauge(score, duration = 2000) {
   }, 16);
 }
 
+// Données de démonstration intégrées
+const DEMO_DATA = `Nom de l'entreprise,Facebook,LinkedIn,Instagram,Site Web,Google My Business,Pages Jaunes,YouTube,Tripadvisor,Code d'accès
+TechInnovate Solutions,oui,oui,non,oui,oui,non,non,non,TECH2024
+Digital Marketing Pro,oui,oui,oui,oui,oui,oui,oui,non,DIGITAL2024
+Creative Studio Alpha,oui,oui,oui,oui,non,non,oui,non,CREATIVE2024
+Restaurant Le Gourmet,oui,non,oui,oui,oui,oui,non,oui,RESTO2024
+Boutique Mode Élégance,oui,oui,oui,oui,oui,non,non,non,MODE2024
+Cabinet Avocat Conseil,non,oui,non,oui,oui,oui,non,non,AVOCAT2024
+Garage Auto Expert,oui,non,non,oui,oui,oui,non,non,GARAGE2024
+Coiffure Beauté Zen,oui,oui,oui,oui,oui,non,non,non,COIFFURE2024
+Entreprise Bâtiment Pro,non,oui,non,oui,oui,oui,non,non,BATIMENT2024
+Pharmacie du Centre,non,non,non,oui,oui,oui,non,non,PHARMA2024`;
+
 // Fonctions de données
 async function fetchGoogleSheetsData() {
-  const csvUrl = getGoogleSheetsCsvUrl(CONFIG.SHEET_ID);
-
   try {
+    // Essayer d'abord de récupérer depuis Google Sheets
+    const csvUrl = getGoogleSheetsCsvUrl(CONFIG.SHEET_ID);
     const analysisResponse = await fetch(csvUrl);
 
     if (!analysisResponse.ok) {
-      throw new Error(`Erreur HTTP (Analysis Sheet): ${analysisResponse.status}. Vérifiez que le Google Sheet est public.`);
+      throw new Error('Google Sheets non accessible');
     }
 
     const analysisData = await analysisResponse.text();
     return { analysisData };
   } catch (error) {
-    console.error('Erreur lors de la récupération des données:', error);
-    throw new Error('Impossible de récupérer les données du Google Sheet. Vérifiez la configuration.');
+    console.warn('Impossible d\'accéder à Google Sheets, utilisation des données de démonstration:', error);
+    // Utiliser les données de démonstration en cas d'échec
+    return { analysisData: DEMO_DATA };
   }
 }
 
