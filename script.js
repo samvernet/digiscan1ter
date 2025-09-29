@@ -391,7 +391,7 @@ function createRadarChart() {
           pointRadius: 4,
         },
         {
-          label: 'Moyenne du marché',
+          label: 'Moyenne de la concurrence',
           data: PLATFORMS.map((p) => analysisData.averages[p.key]),
           backgroundColor: 'rgba(156, 163, 175, 0.1)',
           borderColor: 'rgba(156, 163, 175, 0.8)',
@@ -448,7 +448,7 @@ function createPerformanceChart() {
           borderRadius: 8,
         },
         {
-          label: 'Moyenne du marché',
+          label: 'Moyenne de la concurrence',
           data: PLATFORMS.map((p) => analysisData.averages[p.key]),
           backgroundColor: 'rgba(156, 163, 175, 0.6)',
           borderRadius: 8,
@@ -591,4 +591,5 @@ document.addEventListener('DOMContentLoaded', async function () {
     analysisData = null;
     selectedCompany = null;
   });
+
 });
