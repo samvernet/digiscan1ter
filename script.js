@@ -11,8 +11,18 @@ const PLATFORMS = [
   { key: 'linkedin', name: 'LinkedIn', icon: '💼', color: '#0A66C2' },
   { key: 'instagram', name: 'Instagram', icon: '📷', color: '#E4405F' },
   { key: 'website', name: 'Site Web', icon: '🌐', color: '#059669' },
-  { key: 'googleMyBusiness', name: 'Google My Business', icon: '📍', color: '#4285F4' },
-  { key: 'pagesJaunes', name: 'Pages Jaunes', icon: '📞', color: '#FFD700' },
+  {
+    key: 'googleMyBusiness',
+    name: 'Google My Business',
+    icon: '📍',
+    color: '#4285F4',
+  },
+  {
+    key: 'pagesJaunes',
+    name: 'Pages Jaunes',
+    icon: '📞',
+    color: '#FFD700',
+  },
   { key: 'youtube', name: 'YouTube', icon: '📺', color: '#FF0000' },
   { key: 'tripadvisor', name: 'Tripadvisor', icon: '✈️', color: '#00AF87' },
 ];
@@ -43,92 +53,76 @@ function getVisibilityLevel(score) {
   if (score < 25) {
     return {
       level: 'Faible',
-      description: 'Votre visibilité digitale nécessite une attention immédiate. Il est crucial de développer votre présence sur les plateformes digitales essentielles pour rester compétitif.',
+      description:
+        'Votre visibilité digitale nécessite une attention immédiate. Il est crucial de développer votre présence sur les plateformes digitales essentielles pour rester compétitif.',
       className: 'faible',
       icon: '📊',
     };
   } else if (score >= 25 && score <= 50) {
     return {
       level: 'Modéré',
-      description: 'Votre entreprise a établi une base digitale solide, mais il existe encore des opportunités d\'amélioration pour maximiser votre visibilité en ligne.',
+      description:
+        'Votre entreprise a établi une base digitale solide, mais il existe encore des opportunités d\'amélioration pour maximiser votre visibilité en ligne.',
       className: 'modere',
       icon: '🎯',
     };
   } else {
     return {
       level: 'Dynamique',
-      description: 'Excellent ! Votre entreprise démontre une forte maturité digitale avec une présence bien établie sur les principales plateformes. Continuez à maintenir cette excellence.',
+      description:
+        'Excellent ! Votre entreprise démontre une forte maturité digitale avec une présence bien établie sur les principales plateformes. Continuez à maintenir cette excellence.',
       className: 'dynamique',
       icon: '🏆',
     };
   }
 }
 
-// Fonction pour obtenir la couleur de la jauge selon le score
-function getGaugeColor(score) {
-  if (score < 25) return '#dc2626'; // Rouge
-  if (score >= 25 && score <= 50) return '#ea580c'; // Orange
-  return '#16a34a'; // Vert
+function getScoreColor(score) {
+  if (score < 25) {
+    return {
+      primary: '#dc2626',
+      secondary: '#fca5a5',
+      background: 'rgba(254, 226, 226, 0.3)',
+      status: 'À améliorer'
+    };
+  } else if (score >= 25 && score <= 50) {
+    return {
+      primary: '#ea580c',
+      secondary: '#fdba74',
+      background: 'rgba(255, 237, 213, 0.3)',
+      status: 'En développement'
+    };
+  } else {
+    return {
+      primary: '#16a34a',
+      secondary: '#86efac',
+      background: 'rgba(220, 252, 231, 0.3)',
+      status: 'Excellent'
+    };
+  }
 }
-
-// Fonction pour animer la jauge
-function animateGauge(score, duration = 2000) {
-  const gaugeFill = document.getElementById('gaugeFill');
-  const gaugePercentage = document.getElementById('gaugePercentage');
-  
-  const circumference = 251.33; // Approximation de la longueur de l'arc
-  const targetStrokeDasharray = (score / 100) * circumference;
-  
-  // Couleur selon le score
-  const color = getGaugeColor(score);
-  gaugeFill.style.stroke = color;
-  
-  let currentProgress = 0;
-  const increment = score / (duration / 16);
-  
-  const timer = setInterval(() => {
-    currentProgress += increment;
-    if (currentProgress >= score) {
-      currentProgress = score;
-      clearInterval(timer);
-    }
-    
-    const strokeDasharray = (currentProgress / 100) * circumference;
-    gaugeFill.setAttribute('stroke-dasharray', `${strokeDasharray} ${circumference}`);
-    gaugePercentage.textContent = Math.floor(currentProgress) + '%';
-  }, 16);
-}
-
-// Données de démonstration intégrées
-const DEMO_DATA = `Nom de l'entreprise,Facebook,LinkedIn,Instagram,Site Web,Google My Business,Pages Jaunes,YouTube,Tripadvisor,Code d'accès
-TechInnovate Solutions,oui,oui,non,oui,oui,non,non,non,TECH2024
-Digital Marketing Pro,oui,oui,oui,oui,oui,oui,oui,non,DIGITAL2024
-Creative Studio Alpha,oui,oui,oui,oui,non,non,oui,non,CREATIVE2024
-Restaurant Le Gourmet,oui,non,oui,oui,oui,oui,non,oui,RESTO2024
-Boutique Mode Élégance,oui,oui,oui,oui,oui,non,non,non,MODE2024
-Cabinet Avocat Conseil,non,oui,non,oui,oui,oui,non,non,AVOCAT2024
-Garage Auto Expert,oui,non,non,oui,oui,oui,non,non,GARAGE2024
-Coiffure Beauté Zen,oui,oui,oui,oui,oui,non,non,non,COIFFURE2024
-Entreprise Bâtiment Pro,non,oui,non,oui,oui,oui,non,non,BATIMENT2024
-Pharmacie du Centre,non,non,non,oui,oui,oui,non,non,PHARMA2024`;
 
 // Fonctions de données
 async function fetchGoogleSheetsData() {
+  const csvUrl = getGoogleSheetsCsvUrl(CONFIG.SHEET_ID);
+
   try {
-    // Essayer d'abord de récupérer depuis Google Sheets
-    const csvUrl = getGoogleSheetsCsvUrl(CONFIG.SHEET_ID);
     const analysisResponse = await fetch(csvUrl);
 
     if (!analysisResponse.ok) {
-      throw new Error('Google Sheets non accessible');
+      throw new Error(
+        `Erreur HTTP (Analysis Sheet): ${analysisResponse.status}. Vérifiez que le Google Sheet est public.`
+      );
     }
 
     const analysisData = await analysisResponse.text();
+
     return { analysisData };
   } catch (error) {
-    console.warn('Impossible d\'accéder à Google Sheets, utilisation des données de démonstration:', error);
-    // Utiliser les données de démonstration en cas d'échec
-    return { analysisData: DEMO_DATA };
+    console.error('Erreur lors de la récupération des données:', error);
+    throw new Error(
+      'Impossible de récupérer les données du Google Sheet. Vérifiez la configuration.'
+    );
   }
 }
 
@@ -176,12 +170,18 @@ function parseCSV(csvContent) {
 
   // Calculer les moyennes
   const averages = {};
-  const globalTotal = companies.reduce((sum, company) => sum + company.score, 0);
+  const globalTotal = companies.reduce(
+    (sum, company) => sum + company.score,
+    0
+  );
   const globalAverage = Math.round(globalTotal / companies.length);
 
   PLATFORMS.forEach((platform) => {
-    const presentCount = companies.filter((company) => company[platform.key]).length;
-    averages[platform.key] = Math.round((presentCount / companies.length) * 100);
+    const presentCount = companies.filter((company) => company[platform.key])
+      .length;
+    averages[platform.key] = Math.round(
+      (presentCount / companies.length) * 100
+    );
   });
 
   return { companies, averages, globalAverage, accessCodes };
@@ -241,6 +241,49 @@ function animateCounter(element, target, duration = 2000) {
   }, 16);
 }
 
+function updateCompanyScoreDisplay() {
+  if (!selectedCompany) return;
+
+  const companyNameElement = document.getElementById('selectedCompanyName');
+  const scoreValueElement = document.getElementById('companyScoreValue');
+  const scoreCircleElement = document.getElementById('scoreCircle');
+  const scoreStatusElement = document.getElementById('scoreStatus');
+  const scoreDescriptionElement = document.getElementById('scoreDescription');
+
+  // Mettre à jour le nom de l'entreprise
+  companyNameElement.textContent = selectedCompany.name;
+
+  // Obtenir les couleurs et statut basés sur le score
+  const scoreInfo = getScoreColor(selectedCompany.score);
+  const visibilityInfo = getVisibilityLevel(selectedCompany.score);
+
+  // Mettre à jour le statut et la description
+  scoreStatusElement.textContent = scoreInfo.status;
+  scoreDescriptionElement.textContent = visibilityInfo.description;
+
+  // Animer le score
+  animateCounter(scoreValueElement, selectedCompany.score);
+
+  // Appliquer les styles dynamiques
+  scoreCircleElement.style.borderColor = scoreInfo.primary;
+  scoreCircleElement.style.background = `conic-gradient(${scoreInfo.primary} ${selectedCompany.score * 3.6}deg, ${scoreInfo.secondary} ${selectedCompany.score * 3.6}deg)`;
+  scoreCircleElement.classList.remove('score-faible', 'score-modere', 'score-dynamique');
+  
+  if (selectedCompany.score < 25) {
+    scoreCircleElement.classList.add('score-faible');
+  } else if (selectedCompany.score <= 50) {
+    scoreCircleElement.classList.add('score-modere');
+  } else {
+    scoreCircleElement.classList.add('score-dynamique');
+  }
+
+  // Ajouter une animation à l'élément
+  scoreCircleElement.style.animation = 'scoreAnimation 1.5s ease-out';
+  setTimeout(() => {
+    scoreCircleElement.style.animation = '';
+  }, 1500);
+}
+
 function updateVisibilityCard() {
   const card = document.getElementById('visibilityCard');
   const level = document.getElementById('visibilityLevel');
@@ -250,9 +293,11 @@ function updateVisibilityCard() {
 
   const visibilityInfo = getVisibilityLevel(selectedCompany.score);
 
+  // Réinitialiser les classes
   card.className = 'visibility-card glass-card';
   textElement.className = 'visibility-text';
 
+  // Ajouter les nouvelles classes
   card.classList.add(visibilityInfo.className);
   textElement.classList.add(visibilityInfo.className);
 
@@ -396,7 +441,9 @@ function createPerformanceChart() {
           data: PLATFORMS.map((p) => (selectedCompany[p.key] ? 100 : 0)),
           backgroundColor: PLATFORMS.map((p) => {
             const isPresent = selectedCompany[p.key];
-            return isPresent ? 'rgba(34, 197, 94, 0.8)' : 'rgba(239, 68, 68, 0.8)';
+            return isPresent
+              ? 'rgba(34, 197, 94, 0.8)'
+              : 'rgba(239, 68, 68, 0.8)';
           }),
           borderRadius: 8,
         },
@@ -434,10 +481,6 @@ function createPerformanceChart() {
 function updateDashboard() {
   if (!selectedCompany || !analysisData) return;
 
-  // Mettre à jour le nom de l'entreprise et la jauge
-  document.getElementById('companyName').textContent = selectedCompany.name;
-  animateGauge(selectedCompany.score);
-
   // Mettre à jour les titres
   document.getElementById('radarTitle').textContent = `Comparaison Radar - ${selectedCompany.name}`;
   document.getElementById('performanceTitle').textContent = `Performance par Plateforme - ${selectedCompany.name}`;
@@ -445,131 +488,107 @@ function updateDashboard() {
   document.getElementById('analysisScore').textContent = `Score global : ${selectedCompany.score}%`;
 
   // Mettre à jour les composants
+  updateCompanyScoreDisplay();
   updateVisibilityCard();
   updatePlatformsGrid();
   createRadarChart();
   createPerformanceChart();
 }
 
-// Export PDF
-function exportToPDF() {
+// Fonction d'impression (remplace l'export PDF)
+function printReport() {
   if (!selectedCompany) return;
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-
-  // Header
-  pdf.setFillColor(59, 130, 246);
-  pdf.rect(0, 0, 210, 40, 'F');
-
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(20);
-  pdf.text('Rapport de Maturité Digitale', 20, 25);
-
-  pdf.setFontSize(10);
-  pdf.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, 20, 35);
-
-  // Company info
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFontSize(16);
-  pdf.text(`Entreprise: ${selectedCompany.name}`, 20, 60);
-  pdf.text(`Score Global: ${selectedCompany.score}%`, 20, 75);
-
-  const visibilityInfo = getVisibilityLevel(selectedCompany.score);
-  pdf.text(`Niveau de Visibilité: ${visibilityInfo.level}`, 20, 90);
-
-  // Platforms
-  let yPos = 110;
-  pdf.setFontSize(12);
-  pdf.text('Analyse par Plateforme:', 20, yPos);
-
-  PLATFORMS.forEach((platform) => {
-    yPos += 15;
-    const status = selectedCompany[platform.key] ? 'Présent' : 'Absent';
-    const average = analysisData.averages[platform.key];
-    pdf.text(`${platform.name}: ${status} (Moyenne: ${average}%)`, 25, yPos);
-  });
-
-  pdf.save(`rapport-${selectedCompany.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+  
+  // Déclencher l'impression de la page
+  window.print();
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async function () {
+  // Load access codes from Google Sheet
   try {
     const { analysisData: csvData } = await fetchGoogleSheetsData();
     analysisData = parseCSV(csvData);
     console.log('Access codes loaded:', analysisData.accessCodes);
   } catch (error) {
     console.error('Failed to load access codes:', error);
-    alert('Failed to load access codes from Google Sheet. Check the console for details.');
+    alert(
+      'Failed to load access codes from Google Sheet. Check the console for details.'
+    );
   }
 
   // Formulaire de connexion
-  document.getElementById('loginForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-    const formData = {
-      firstName: document.getElementById('firstName').value,
-      lastName: document.getElementById('lastName').value,
-      company: document.getElementById('company').value,
-      email: document.getElementById('email').value,
-      accessCode: document.getElementById('accessCode').value,
-    };
+      const formData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        company: document.getElementById('company').value,
+        email: document.getElementById('email').value,
+        accessCode: document.getElementById('accessCode').value,
+      };
 
-    // Valider le code d'accès
-    const accessInfo = validateAccessCode(formData.accessCode);
-    if (!accessInfo) {
-      alert('Code d\'accès invalide');
-      return;
-    }
-
-    userInfo = formData;
-    showScreen('loadingScreen');
-
-    try {
-      // Tracker l'accès utilisateur
-      await trackUserAccess(userInfo, formData.accessCode);
-
-      // Charger les données
-      const { analysisData: csvData } = await fetchGoogleSheetsData();
-      analysisData = parseCSV(csvData);
-
-      // Sélectionner l'entreprise
-      if (accessInfo.rowIndex === -1) {
-        selectedCompany = analysisData.companies[0];
-      } else {
-        selectedCompany = analysisData.companies.find((c) =>
-          c.name.toLowerCase().includes(accessInfo.companyName.toLowerCase())
-        ) || analysisData.companies[accessInfo.rowIndex - 1];
+      // Valider le code d'accès
+      const accessInfo = validateAccessCode(formData.accessCode);
+      if (!accessInfo) {
+        alert('Code d\'accès invalide');
+        return;
       }
 
-      // Mettre à jour l'interface
-      document.getElementById('companiesCount').textContent = 
-        `Analyse complète de ${analysisData.companies.length} entreprises`;
+      userInfo = formData;
+      showScreen('loadingScreen');
 
-      animateCounter(document.getElementById('globalScore'), analysisData.globalAverage);
+      try {
+        // Tracker l'accès utilisateur
+        await trackUserAccess(userInfo, formData.accessCode);
 
-      updateDashboard();
-      showScreen('dashboard');
-    } catch (error) {
-      console.error('Erreur:', error);
-      alert('Erreur lors du chargement des données: ' + error.message);
-      showScreen('accessForm');
-    }
-  });
+        // Charger les données
+        const { analysisData: csvData } = await fetchGoogleSheetsData();
+        analysisData = parseCSV(csvData);
 
-  // Bouton d'export
-  document.getElementById('exportIndividual').addEventListener('click', exportToPDF);
+        // Sélectionner l'entreprise
+        if (accessInfo.rowIndex === -1) {
+          selectedCompany = analysisData.companies[0];
+        } else {
+          selectedCompany =
+            analysisData.companies.find((c) =>
+              c.name.toLowerCase().includes(accessInfo.companyName.toLowerCase())
+            ) || analysisData.companies[accessInfo.rowIndex - 1];
+        }
+
+        // Mettre à jour l'interface
+        document.getElementById('companiesCount').textContent = `Analyse complète de ${analysisData.companies.length} entreprises`;
+
+        animateCounter(
+          document.getElementById('globalScore'),
+          analysisData.globalAverage
+        );
+
+        updateDashboard();
+
+        showScreen('dashboard');
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du chargement des données: ' + error.message);
+        showScreen('accessForm');
+      }
+    });
+
+  // Bouton d'export (impression)
+  document
+    .getElementById('exportIndividual')
+    .addEventListener('click', printReport);
 
   // Bouton retour
   document.getElementById('backBtn').addEventListener('click', function () {
     showScreen('accessForm');
+    // Reset form
     document.getElementById('loginForm').reset();
     userInfo = null;
     analysisData = null;
     selectedCompany = null;
   });
 });
-    </script>
-</body>
-</html>

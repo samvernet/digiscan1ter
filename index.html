@@ -4,645 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard KPI Maturité Digitale</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-/* Reset et base */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    min-height: 100vh;
-    color: #333;
-}
-
-/* Glassmorphism */
-.glass-card {
-    backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    padding: 1.5rem;
-}
-
-/* Formulaire d'accès */
-.access-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-}
-
-.form-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.lock-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #2563eb;
-}
-
-.form-header h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-.form-header p {
-    color: #6b7280;
-    margin-bottom: 1rem;
-}
-
-.demo-codes {
-    background: rgba(59, 130, 246, 0.1);
-    padding: 1rem;
-    border-radius: 12px;
-    margin-top: 1rem;
-}
-
-.demo-codes p {
-    font-weight: 600;
-    color: #1e40af;
-    margin-bottom: 0.5rem;
-}
-
-.demo-list {
-    font-size: 0.875rem;
-    color: #1e40af;
-}
-
-.access-form {
-    max-width: 400px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 0.5rem;
-}
-
-.input-container {
-    position: relative;
-}
-
-.input-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    color: #9ca3af;
-}
-
-.input-container input {
-    width: 100%;
-    padding: 12px 12px 12px 45px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: #fff;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.input-container input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background: #fff;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.submit-btn {
-    width: 100%;
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.submit-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.2);
-}
-
-/* Écran de chargement */
-.loading-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-}
-
-.spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(59, 130, 246, 0.3);
-    border-top: 4px solid #3b82f6;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Dashboard */
-.dashboard-container {
-    min-height: 100vh;
-    background: #fff;
-}
-
-.dashboard-header {
-    background: #2563eb;
-    color: white;
-    padding: 1.5rem 0;
-}
-
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-}
-
-.header-left h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-}
-
-.header-left p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-}
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.global-score {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.score-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.score-label {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.75rem;
-}
-
-.back-btn {
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.dashboard-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 1.5rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-/* Jauge circulaire */
-.gauge-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.gauge-card h2 {
-    color: #1f2937;
-    margin-bottom: 1.5rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-.gauge-container {
-    position: relative;
-    width: 200px;
-    height: 120px;
-    margin-bottom: 1rem;
-}
-
-.gauge-svg {
-    width: 100%;
-    height: 100%;
-}
-
-.gauge-bg {
-    fill: none;
-    stroke: #e5e7eb;
-    stroke-width: 12;
-    stroke-linecap: round;
-}
-
-.gauge-fill {
-    fill: none;
-    stroke-width: 12;
-    stroke-linecap: round;
-    transition: stroke-dasharray 1s ease-in-out;
-}
-
-.gauge-text {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.gauge-percentage {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #1f2937;
-}
-
-.gauge-label {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin-top: 0.5rem;
-}
-
-.company-name {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-/* Export */
-.export-card h3 {
-    color: #1f2937;
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.export-buttons {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.export-btn {
-    flex: 1;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-.export-btn.individual {
-    background: #2563eb;
-    color: white;
-}
-
-.export-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Graphiques */
-.charts-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.chart-card {
-    text-align: center;
-}
-
-.chart-card h3 {
-    color: #1f2937;
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.chart-card canvas {
-    max-height: 280px;
-}
-
-/* Niveau de visibilité */
-.visibility-card {
-    border: 1px solid;
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    padding: 1rem;
-}
-
-.visibility-card.faible {
-    border-color: #fca5a5;
-    background: rgba(254, 226, 226, 0.3);
-}
-
-.visibility-card.modere {
-    border-color: #fdba74;
-    background: rgba(255, 237, 213, 0.3);
-}
-
-.visibility-card.dynamique {
-    border-color: #86efac;
-    background: rgba(220, 252, 231, 0.3);
-}
-
-.visibility-content {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-}
-
-.visibility-icon {
-    font-size: 2.5rem;
-    flex-shrink: 0;
-}
-
-.visibility-text h3 {
-    font-size: 1.125rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
-}
-
-.visibility-text.faible h3 {
-    color: #dc2626;
-}
-
-.visibility-text.modere h3 {
-    color: #ea580c;
-}
-
-.visibility-text.dynamique h3 {
-    color: #16a34a;
-}
-
-.visibility-text p {
-    color: #4b5563;
-    line-height: 1.4;
-    font-size: 0.875rem;
-}
-
-/* Analyse détaillée */
-.analysis-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.analysis-icon {
-    width: 35px;
-    height: 35px;
-    background: #2563eb;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.125rem;
-    color: white;
-}
-
-.analysis-header h2 {
-    color: #1f2937;
-    font-size: 1.25rem;
-    font-weight: bold;
-}
-
-.analysis-header p {
-    color: #6b7280;
-    font-size: 0.875rem;
-}
-
-.platforms-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-}
-
-.platform-card {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    padding: 1rem;
-    transition: all 0.3s ease;
-}
-
-.platform-card:hover {
-    background: rgba(255, 255, 255, 0.8);
-    transform: translateY(-1px);
-}
-
-.platform-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-}
-
-.platform-info {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.platform-icon {
-    font-size: 1.25rem;
-}
-
-.platform-name {
-    font-weight: 500;
-    color: #1f2937;
-    font-size: 0.75rem;
-}
-
-.trend-icon {
-    font-size: 0.875rem;
-}
-
-.trend-up { color: #16a34a; }
-.trend-down { color: #dc2626; }
-.trend-equal { color: #6b7280; }
-
-.platform-status {
-    margin-bottom: 0.75rem;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.status-badge.present {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.status-badge.absent {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.progress-section {
-    margin-bottom: 0.75rem;
-}
-
-.progress-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.25rem;
-    font-size: 0.75rem;
-}
-
-.progress-label {
-    color: #6b7280;
-}
-
-.progress-value {
-    font-weight: 500;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #e5e7eb;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.8s ease;
-}
-
-.progress-fill.company {
-    background: #16a34a;
-}
-
-.progress-fill.company.absent {
-    background: #dc2626;
-}
-
-.progress-fill.average {
-    background: #3b82f6;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .header-left h1 {
-        font-size: 1.75rem;
-    }
-
-    .charts-container {
-        grid-template-columns: 1fr;
-    }
-
-    .export-buttons {
-        flex-direction: column;
-    }
-
-    .visibility-content {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .platforms-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .gauge-container {
-        width: 150px;
-        height: 90px;
-    }
-
-    .gauge-percentage {
-        font-size: 2rem;
-    }
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-    animation: fadeIn 0.6s ease-out;
-}
-    </style>
 </head>
 <body>
     <!-- Formulaire d'accès -->
@@ -741,18 +106,21 @@ body {
         </div>
 
         <div class="dashboard-content">
-            <!-- Jauge de score de l'entreprise -->
-            <div class="gauge-card glass-card">
+            <!-- Affichage du score de l'entreprise -->
+            <div class="company-score-card glass-card">
                 <h2>Score de Maturité Digitale</h2>
-                <div class="company-name" id="companyName">Nom de l'entreprise</div>
-                <div class="gauge-container">
-                    <svg class="gauge-svg" viewBox="0 0 200 120">
-                        <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100"></path>
-                        <path class="gauge-fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100" stroke-dasharray="0 251.33"></path>
-                    </svg>
-                    <div class="gauge-text">
-                        <div class="gauge-percentage" id="gaugePercentage">0%</div>
-                        <div class="gauge-label">Taux de maturité</div>
+                <div class="company-score-display">
+                    <div class="company-info">
+                        <h3 id="selectedCompanyName">Entreprise sélectionnée</h3>
+                        <div class="score-container">
+                            <div class="score-circle" id="scoreCircle">
+                                <div class="score-percentage" id="companyScoreValue">0%</div>
+                            </div>
+                            <div class="score-details">
+                                <div class="score-status" id="scoreStatus">En attente</div>
+                                <div class="score-description" id="scoreDescription">Analyse en cours...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -762,7 +130,7 @@ body {
                 <h3>Exporter votre Rapport</h3>
                 <div class="export-buttons">
                     <button id="exportIndividual" class="export-btn individual">
-                        📄 Exporter votre Rapport Personnel
+                        🖨️ Exporter votre Rapport Personnel
                     </button>
                 </div>
             </div>
@@ -804,7 +172,217 @@ body {
                     <!-- Plateformes générées dynamiquement -->
                 </div>
             </div>
+
+            <!-- Plan d'action -->
+            <div class="action-plan-card glass-card">
+                <div class="action-plan-header">
+                    <div class="action-plan-icon">📋</div>
+                    <div>
+                        <h2>Plan d'Action - Maturité DigiScan</h2>
+                        <p>Recommandations personnalisées pour améliorer votre maturité digitale</p>
+                    </div>
+                </div>
+
+                <div class="action-plan-content">
+                    <div class="action-section">
+                        <h3>🎯 Objectifs Prioritaires</h3>
+                        <ul>
+                            <li><strong>Améliorer la visibilité en ligne</strong> : Optimiser votre présence sur les plateformes digitales essentielles</li>
+                            <li><strong>Renforcer l'engagement client</strong> : Développer des interactions de qualité avec votre audience</li>
+                            <li><strong>Moderniser votre écosystème digital</strong> : Mettre à jour vos outils et processus digitaux</li>
+                        </ul>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>🚀 Actions Immédiates (0-3 mois)</h3>
+                        <div class="action-item">
+                            <h4>1. Audit Digital Complet</h4>
+                            <p><strong>Objectif :</strong> Identifier les lacunes actuelles dans votre présence digitale</p>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Analyser la performance de votre site web (SEO, vitesse, responsive design)</li>
+                                <li>Évaluer votre présence sur les réseaux sociaux</li>
+                                <li>Vérifier la cohérence de vos informations sur toutes les plateformes</li>
+                            </ul>
+                        </div>
+
+                        <div class="action-item">
+                            <h4>2. Optimisation du Site Web</h4>
+                            <p><strong>Objectif :</strong> Améliorer l'expérience utilisateur et le référencement</p>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Optimiser la vitesse de chargement des pages</li>
+                                <li>Améliorer le design responsive pour mobile</li>
+                                <li>Mettre à jour le contenu et les informations de contact</li>
+                                <li>Installer les outils d'analyse (Google Analytics, Search Console)</li>
+                            </ul>
+                        </div>
+
+                        <div class="action-item">
+                            <h4>3. Configuration Google My Business</h4>
+                            <p><strong>Objectif :</strong> Maximiser votre visibilité locale</p>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Créer ou optimiser votre fiche Google My Business</li>
+                                <li>Ajouter des photos de qualité de votre entreprise</li>
+                                <li>Renseigner tous les champs (horaires, services, description)</li>
+                                <li>Encourager et répondre aux avis clients</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>📈 Actions à Moyen Terme (3-6 mois)</h3>
+                        <div class="action-item">
+                            <h4>4. Stratégie de Contenu Digital</h4>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Créer un calendrier éditorial pour les réseaux sociaux</li>
+                                <li>Développer du contenu de valeur (articles de blog, infographies)</li>
+                                <li>Mettre en place une newsletter régulière</li>
+                            </ul>
+                        </div>
+
+                        <div class="action-item">
+                            <h4>5. Développement des Réseaux Sociaux</h4>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Identifier les plateformes les plus pertinentes pour votre secteur</li>
+                                <li>Créer des profils professionnels complets</li>
+                                <li>Planifier des publications régulières et engageantes</li>
+                                <li>Interagir avec votre communauté</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>🎯 Actions à Long Terme (6-12 mois)</h3>
+                        <div class="action-item">
+                            <h4>6. Automatisation et Outils Avancés</h4>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Implémenter des outils de gestion des réseaux sociaux</li>
+                                <li>Mettre en place des chatbots pour l'assistance client</li>
+                                <li>Développer un système de CRM digital</li>
+                            </ul>
+                        </div>
+
+                        <div class="action-item">
+                            <h4>7. Analyse et Optimisation Continue</h4>
+                            <p><strong>Actions :</strong></p>
+                            <ul>
+                                <li>Surveiller régulièrement les métriques de performance</li>
+                                <li>Ajuster la stratégie en fonction des résultats</li>
+                                <li>Faire des tests A/B sur les campagnes</li>
+                                <li>Effectuer des audits trimestriels</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>📊 Indicateurs de Performance Clés (KPIs)</h3>
+                        <div class="kpi-grid">
+                            <div class="kpi-item">
+                                <h4>Visibilité Web</h4>
+                                <ul>
+                                    <li>Position moyenne dans les résultats de recherche</li>
+                                    <li>Nombre de visiteurs uniques sur le site</li>
+                                    <li>Taux de rebond</li>
+                                </ul>
+                            </div>
+                            <div class="kpi-item">
+                                <h4>Engagement Social</h4>
+                                <ul>
+                                    <li>Nombre d'abonnés sur les réseaux sociaux</li>
+                                    <li>Taux d'engagement (likes, partages, commentaires)</li>
+                                    <li>Portée des publications</li>
+                                </ul>
+                            </div>
+                            <div class="kpi-item">
+                                <h4>Conversion</h4>
+                                <ul>
+                                    <li>Nombre de leads générés en ligne</li>
+                                    <li>Taux de conversion des visiteurs en clients</li>
+                                    <li>Chiffre d'affaires généré par le digital</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>💡 Recommandations Spécifiques</h3>
+                        <div class="recommendation-item">
+                            <p><strong>Pour les TPE/PME :</strong> Concentrez-vous d'abord sur Google My Business et un site web optimisé avant d'investir dans les réseaux sociaux.</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <p><strong>Pour les entreprises B2B :</strong> Priorisez LinkedIn et le content marketing pour établir votre expertise sectorielle.</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <p><strong>Pour les entreprises B2C :</strong> Développez une présence forte sur Instagram et Facebook avec du contenu visuel engageant.</p>
+                        </div>
+                        <div class="recommendation-item">
+                            <p><strong>Pour les entreprises locales :</strong> Misez sur l'optimisation locale (Google My Business, Pages Jaunes, avis clients).</p>
+                        </div>
+                    </div>
+
+                    <div class="action-section">
+                        <h3>⏱️ Planning de Mise en Œuvre</h3>
+                        <div class="timeline">
+                            <div class="timeline-item month-1">
+                                <div class="timeline-marker">1</div>
+                                <div class="timeline-content">
+                                    <h4>Mois 1</h4>
+                                    <p>Audit digital + Optimisation site web</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item month-2">
+                                <div class="timeline-marker">2</div>
+                                <div class="timeline-content">
+                                    <h4>Mois 2</h4>
+                                    <p>Configuration Google My Business + Création contenu</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item month-3">
+                                <div class="timeline-marker">3</div>
+                                <div class="timeline-content">
+                                    <h4>Mois 3</h4>
+                                    <p>Lancement réseaux sociaux + Newsletter</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item month-6">
+                                <div class="timeline-marker">6</div>
+                                <div class="timeline-content">
+                                    <h4>Mois 6</h4>
+                                    <p>Première évaluation + Ajustements stratégie</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item month-12">
+                                <div class="timeline-marker">12</div>
+                                <div class="timeline-content">
+                                    <h4>Mois 12</h4>
+                                    <p>Bilan annuel + Planification année suivante</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-section final-note">
+                        <h3>🎯 Message de Conclusion</h3>
+                        <p class="conclusion-text">
+                            La transformation digitale est un processus continu qui demande du temps et de la persévérance. 
+                            Ce plan d'action vous donne une feuille de route claire, mais n'hésitez pas à l'adapter selon vos 
+                            spécificités et vos ressources. L'important est de commencer par les actions qui auront le plus 
+                            d'impact sur votre visibilité et votre développement commercial.
+                        </p>
+                        <p class="success-indicator">
+                            <strong>Objectif de réussite :</strong> Atteindre un score de maturité digitale de 75% ou plus dans les 12 mois.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
+    <script src="script.js"></script>
+</body>
+</html>
