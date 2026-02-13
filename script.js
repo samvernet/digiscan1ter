@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         // Mettre à jour l'interface
-        document.getElementById('companiesCount').textContent = `Analyse complète de ${analysisData.companies.length} entreprises`;
+        document.getElementById('companiesCount').textContent = `Analyse complète de la visibilité web de votre établissement`;
 
         animateCounter(
           document.getElementById('globalScore'),
@@ -593,3 +593,4 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 
 });
+
